@@ -1,33 +1,34 @@
 package hyperloglog
 
 import (
+	"bytes"
+	_ "embed"
 	"encoding/binary"
 	"math"
-	"os"
 )
+
+//go:embed bias.bin
+var biasRaw []byte
 
 // empirical bias correction pairs
 // loads from local binary due to huge size
 var bias [15][][2]float64
 
 func init() {
-	fh, err := os.OpenFile("bias.bin", os.O_RDONLY, 0644)
-	if err != nil {
-		return
-	}
-	defer func() { _ = fh.Close() }()
+	var err error
+	r := bytes.NewBuffer(biasRaw)
 	for i := 0; i < 15; i++ {
 		var buf [8]byte
-		if _, err = fh.Read(buf[:]); err != nil {
+		if _, err = r.Read(buf[:]); err != nil {
 			return
 		}
 		n := binary.LittleEndian.Uint64(buf[:])
 		for j := uint64(0); j < n; j++ {
-			if _, err = fh.Read(buf[:]); err != nil {
+			if _, err = r.Read(buf[:]); err != nil {
 				return
 			}
 			dist := binary.LittleEndian.Uint64(buf[:])
-			if _, err = fh.Read(buf[:]); err != nil {
+			if _, err = r.Read(buf[:]); err != nil {
 				return
 			}
 			bias_ := binary.LittleEndian.Uint64(buf[:])
