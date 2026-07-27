@@ -129,12 +129,10 @@ func init() {
 		Help: "Observed min frequency / total elements",
 	}, []string{"name"})
 
-	heavyPercentiles = promauto.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "hitter_freq_percentile",
-			Help: "Frequency percentiles in top list",
-		},
-		[]string{"name", "p"},
+	heavyPercentiles = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "hitter_freq_percentile",
+		Help: "Frequency percentiles in top list",
+	}, []string{"name", "p"},
 	)
 
 	heavyFreqDist = promauto.NewHistogramVec(prometheus.HistogramOpts{
@@ -162,4 +160,6 @@ var (
 	heavyObservedMinError *prometheus.GaugeVec
 	heavyPercentiles      *prometheus.GaugeVec
 	heavyFreqDist         *prometheus.HistogramVec
+
+	_ = NewHeavy
 )
